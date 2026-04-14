@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thalita's Space</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        softBg: '#FDFBF7',
+                        softPink: '#F3D8DF',
+                        softGreen: '#D5E6D3',
+                        softPurple: '#DFD8F3',
+                        softBlue: '#D8E8F3',
+                        darkText: '#2D3142',
+                        grayText: '#9094A6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #2D3142;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .glass-nav {
+            background: rgba(253, 251, 247, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .checkbox-custom:checked + div {
+            background-color: #2D3142;
+            border-color: #2D3142;
+        }
+        .checkbox-custom:checked + div svg {
+            display: block;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex justify-center pb-24">
+
+    <!-- Mobile App Container -->
+    <div class="w-full max-w-md p-6 relative">
+
+        <!-- HEADER -->
+        <header class="flex justify-between items-center mb-8 pt-4">
+            <div>
+                <p class="text-grayText text-sm font-medium mb-1" id="currentDate">Hari ini</p>
+                <h1 class="text-2xl font-bold">Hi, Thalita ✨</h1>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-softPink flex items-center justify-center shadow-sm">
+                <i class="ph ph-sparkle text-2xl text-pink-500"></i>
+            </div>
+        </header>
+
+        <!-- VIEW: HOME (DASHBOARD) -->
+        <div id="view-home" class="tab-content active space-y-6">
+            
+            <!-- Vibe Check / Quote -->
+            <div class="bg-gradient-to-r from-softPurple to-softBlue rounded-3xl p-5 shadow-sm">
+                <p class="text-sm font-semibold opacity-80 mb-1">Daily Reminder</p>
+                <p class="font-medium text-lg">"You're doing great, Thalita. Securing the bag while staying sane!" 💅</p>
+            </div>
+
+            <!-- Savings Goal Widget -->
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-bold flex items-center gap-2"><i class="ph-fill ph-target text-softPurple text-xl"></i> Savings Era</h2>
+                    <span class="text-xs font-bold bg-softGreen text-green-800 px-2 py-1 rounded-full" id="savingsPercent">0%</span>
+                </div>
+                <p class="text-sm text-grayText mb-2" id="savingsGoalName">Konser Impian 🎫</p>
+                <div class="w-full bg-gray-100 rounded-full h-3 mb-2 overflow-hidden">
+                    <div id="savingsProgressBar" class="bg-darkText h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-xs font-medium">
+                    <span id="savingsCurrent">Rp 0</span>
+                    <span class="text-grayText" id="savingsTarget">Rp 2.000.000</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Mini Wallet Widget -->
+                <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+                    <div class="w-8 h-8 rounded-full bg-softGreen flex items-center justify-center mb-3">
+                        <i class="ph ph-wallet text-green-700"></i>
+                    </div>
+                    <p class="text-xs text-grayText font-medium">Sisa Uang</p>
+                    <p class="font-bold text-sm truncate" id="dashBalance">Rp 0</p>
+                </div>
+
+                <!-- Mini Tasks Widget -->
+                <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+                    <div class="w-8 h-8 rounded-full bg-softPink flex items-center justify-center mb-3">
+                        <i class="ph ph-check-circle text-pink-700"></i>
+                    </div>
+                    <p class="text-xs text-grayText font-medium">Quests Selesai</p>
+                    <p class="font-bold text-sm" id="dashTasks">0/0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: SCHEDULE / TASKS -->
+        <div id="view-schedule" class="tab-content space-y-6">
+            <h2 class="text-xl font-bold flex items-center gap-2 mb-4">
+                <i class="ph-fill ph-calendar-check text-softBlue text-2xl"></i> Daily Quests
+            </h2>
+            
+            <!-- Add Task Input -->
+            <form id="taskForm" class="flex gap-2">
+                <input type="time" id="taskTime" required class="bg-white border border-gray-200 rounded-2xl px-3 py-3 text-sm outline-none focus:border-softBlue w-28">
+                <input type="text" id="taskInput" placeholder="Nugas, Skincare, dll..." required class="bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-softBlue flex-1">
+                <button type="submit" class="bg-darkText text-white rounded-2xl w-12 flex items-center justify-center active:scale-95 transition-transform">
+                    <i class="ph ph-plus font-bold"></i>
+                </button>
+            </form>
+
+            <!-- Task List -->
+            <div id="taskList" class="space-y-3">
+                <!-- Tasks will be injected here -->
+            </div>
+            
+            <div id="emptyTask" class="text-center py-10 text-grayText text-sm hidden">
+                <i class="ph ph-coffee text-4xl mb-2 opacity-50"></i>
+                <p>Belum ada jadwal. Waktunya me-time?</p>
+            </div>
+        </div>
+
+        <!-- VIEW: WALLET / EXPENSES -->
+        <div id="view-wallet" class="tab-content space-y-6">
+            <h2 class="text-xl font-bold flex items-center gap-2 mb-4">
+                <i class="ph-fill ph-coins text-softGreen text-2xl"></i> Money Moves
+            </h2>
+
+            <!-- Balance Card -->
+            <div class="bg-darkText text-white rounded-3xl p-6 shadow-md relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
+                <p class="text-sm font-medium opacity-80 mb-1">Total Saldo</p>
+                <h3 class="text-3xl font-bold mb-4" id="walletBalance">Rp 0</h3>
+                <div class="flex gap-4">
+                    <div>
+                        <p class="text-xs opacity-70">Pemasukan 📈</p>
+                        <p class="font-semibold text-softGreen" id="walletIncome">Rp 0</p>
+                    </div>
+                    <div>
+                        <p class="text-xs opacity-70">Pengeluaran 📉</p>
+                        <p class="font-semibold text-softPink" id="walletExpense">Rp 0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Transaction -->
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+                <h4 class="font-semibold mb-3 text-sm">Catat Transaksi</h4>
+                <form id="txForm" class="space-y-3">
+                    <div class="flex gap-2">
+                        <select id="txType" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none w-1/3">
+                            <option value="expense">Keluar (-)</option>
+                            <option value="income">Masuk (+)</option>
+                        </select>
+                        <input type="number" id="txAmount" placeholder="Nominal (ex: 50000)" required class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none flex-1">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="txNote" placeholder="Buat beli apa? (ex: Matcha latte)" required class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none flex-1">
+                        <button type="submit" class="bg-darkText text-white rounded-xl px-4 font-medium text-sm active:scale-95 transition-transform">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Transaction List -->
+            <div>
+                <h4 class="font-bold text-sm mb-3">Histori</h4>
+                <div id="txList" class="space-y-3">
+                    <!-- Transactions will be injected here -->
+                </div>
+                 <div id="emptyTx" class="text-center py-6 text-grayText text-sm hidden">
+                    <p>Belum ada pergerakan uang hari ini.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="fixed bottom-0 left-0 w-full glass-nav px-6 py-4 flex justify-around items-center z-50">
+            <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-darkText transition-all" data-target="view-home">
+                <i class="ph-fill ph-house text-2xl"></i>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button onclick="switchTab('schedule')" class="nav-btn flex flex-col items-center gap-1 text-grayText transition-all" data-target="view-schedule">
+                <i class="ph ph-calendar-check text-2xl"></i>
+                <span class="text-[10px] font-medium">Jadwal</span>
+            </button>
+            <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-grayText transition-all" data-target="view-wallet">
+                <i class="ph ph-wallet text-2xl"></i>
+                <span class="text-[10px] font-medium">Wallet</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA STATE (In-Memory for this session) ---
+        let state = {
+            tasks: [
+                { id: 1, text: "Skincare Morning Routine ✨", time: "07:00", done: false },
+                { id: 2, text: "Nugas / Kerja keras bagai quda 💻", time: "10:00", done: false }
+            ],
+            transactions: [
+                { id: 1, type: "income", amount: 1500000, note: "Uang Jajan / Gaji 💸", date: new Date().toISOString() }
+            ],
+            savings: {
+                name: "Konser / Self Reward 🎟️",
+                target: 2000000,
+                current: 500000
+            }
+        };
+
+        // --- UTILS ---
+        const formatIDR = (amount) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+        };
+
+        const setDate = () => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', options);
+        };
+
+        // --- NAVIGATION LOGIC ---
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Reset all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-darkText');
+                btn.classList.add('text-grayText');
+                const icon = btn.querySelector('i');
+                icon.classList.remove('ph-fill');
+                icon.classList.add('ph');
+                btn.querySelector('span').classList.remove('font-bold');
+                btn.querySelector('span').classList.add('font-medium');
+            });
+
+            // Show active tab
+            document.getElementById(`view-${tabName}`).classList.add('active');
+            
+            // Highlight active button
+            const activeBtn = document.querySelector(`[data-target="view-${tabName}"]`);
+            activeBtn.classList.remove('text-grayText');
+            activeBtn.classList.add('text-darkText');
+            const activeIcon = activeBtn.querySelector('i');
+            activeIcon.classList.remove('ph');
+            activeIcon.classList.add('ph-fill');
+            activeBtn.querySelector('span').classList.remove('font-medium');
+            activeBtn.querySelector('span').classList.add('font-bold');
+
+            updateUI();
+        }
+
+        // --- SCHEDULE / TASKS LOGIC ---
+        const taskForm = document.getElementById('taskForm');
+        const taskInput = document.getElementById('taskInput');
+        const taskTime = document.getElementById('taskTime');
+        const taskList = document.getElementById('taskList');
+
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newTask = {
+                id: Date.now(),
+                text: taskInput.value,
+                time: taskTime.value,
+                done: false
+            };
+            state.tasks.push(newTask);
+            // Sort by time
+            state.tasks.sort((a, b) => a.time.localeCompare(b.time));
+            taskInput.value = '';
+            updateUI();
+        });
+
+        function toggleTask(id) {
+            const task = state.tasks.find(t => t.id === id);
+            if (task) {
+                task.done = !task.done;
+                updateUI();
+            }
+        }
+
+        function deleteTask(id) {
+            state.tasks = state.tasks.filter(t => t.id !== id);
+            updateUI();
+        }
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            if (state.tasks.length === 0) {
+                document.getElementById('emptyTask').classList.remove('hidden');
+            } else {
+                document.getElementById('emptyTask').classList.add('hidden');
+                state.tasks.forEach(task => {
+                    const div = document.createElement('div');
+                    div.className = `bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between transition-all ${task.done ? 'opacity-60' : ''}`;
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3 flex-1">
+                            <label class="relative flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only checkbox-custom" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                                <div class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center transition-colors">
+                                    <svg class="w-3 h-3 text-white hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            </label>
+                            <div class="${task.done ? 'line-through text-grayText' : 'text-darkText'}">
+                                <p class="font-semibold text-sm">${task.text}</p>
+                                <p class="text-xs text-grayText flex items-center gap-1"><i class="ph ph-clock"></i> ${task.time}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteTask(${task.id})" class="text-gray-400 hover:text-red-500 p-2"><i class="ph ph-trash"></i></button>
+                    `;
+                    taskList.appendChild(div);
+                });
+            }
+        }
+
+        // --- WALLET / EXPENSE LOGIC ---
+        const txForm = document.getElementById('txForm');
+        const txType = document.getElementById('txType');
+        const txAmount = document.getElementById('txAmount');
+        const txNote = document.getElementById('txNote');
+        const txList = document.getElementById('txList');
+
+        txForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(txAmount.value);
+            if (amount <= 0) return;
+
+            const newTx = {
+                id: Date.now(),
+                type: txType.value,
+                amount: amount,
+                note: txNote.value,
+                date: new Date().toISOString()
+            };
+            
+            // Add to beginning of array
+            state.transactions.unshift(newTx);
+            
+            txAmount.value = '';
+            txNote.value = '';
+            updateUI();
+        });
+
+        function deleteTx(id) {
+            state.transactions = state.transactions.filter(t => t.id !== id);
+            updateUI();
+        }
+
+        function calculateWallet() {
+            let income = 0;
+            let expense = 0;
+            
+            state.transactions.forEach(tx => {
+                if (tx.type === 'income') income += tx.amount;
+                if (tx.type === 'expense') expense += tx.amount;
+            });
+
+            return {
+                income,
+                expense,
+                balance: income - expense
+            };
+        }
+
+        function renderWallet() {
+            const wallet = calculateWallet();
+            
+            // Update Headers
+            document.getElementById('walletBalance').innerText = formatIDR(wallet.balance);
+            document.getElementById('dashBalance').innerText = formatIDR(wallet.balance);
+            document.getElementById('walletIncome').innerText = formatIDR(wallet.income);
+            document.getElementById('walletExpense').innerText = formatIDR(wallet.expense);
+
+            // Render List
+            txList.innerHTML = '';
+            if (state.transactions.length === 0) {
+                document.getElementById('emptyTx').classList.remove('hidden');
+            } else {
+                document.getElementById('emptyTx').classList.add('hidden');
+                state.transactions.forEach(tx => {
+                    const isIncome = tx.type === 'income';
+                    const iconColor = isIncome ? 'text-green-600 bg-softGreen' : 'text-red-600 bg-softPink';
+                    const icon = isIncome ? 'ph-arrow-down-left' : 'ph-arrow-up-right';
+                    const sign = isIncome ? '+' : '-';
+
+                    const div = document.createElement('div');
+                    div.className = 'bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between';
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${iconColor}">
+                                <i class="ph ${icon} text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-sm text-darkText">${tx.note}</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex items-center gap-2">
+                            <p class="font-bold text-sm ${isIncome ? 'text-green-600' : 'text-darkText'}">${sign}${formatIDR(tx.amount)}</p>
+                            <button onclick="deleteTx(${tx.id})" class="text-gray-300 hover:text-red-500"><i class="ph ph-x"></i></button>
+                        </div>
+                    `;
+                    txList.appendChild(div);
+                });
+            }
+        }
+
+        // --- DASHBOARD UPDATES ---
+        function updateDashboard() {
+            // Task count
+            const totalTasks = state.tasks.length;
+            const doneTasks = state.tasks.filter(t => t.done).length;
+            document.getElementById('dashTasks').innerText = `${doneTasks}/${totalTasks}`;
+
+            // Savings calculation
+            const progress = Math.min((state.savings.current / state.savings.target) * 100, 100);
+            document.getElementById('savingsProgressBar').style.width = `${progress}%`;
+            document.getElementById('savingsPercent').innerText = `${Math.round(progress)}%`;
+            document.getElementById('savingsCurrent').innerText = formatIDR(state.savings.current);
+            document.getElementById('savingsTarget').innerText = formatIDR(state.savings.target);
+            document.getElementById('savingsGoalName').innerText = state.savings.name;
+        }
+
+        // --- MASTER UPDATE ---
+        function updateUI() {
+            renderTasks();
+            renderWallet();
+            updateDashboard();
+        }
+
+        // --- INIT ---
+        setDate();
+        updateUI();
+
+    </script>
+</body>
+</html>
